@@ -1,16 +1,7 @@
-/**
- * [
- *    {
- *      id: <int>
- *      task: <string>
- *      timestamp: <string>
- *      isCompleted: <boolean>
- *    }
- * ]
- */
-const book = [];
-const RENDER_EVENT = 'render-book';
-const SAVED_EVENT = 'saved-book';
+
+const todos = [];
+const RENDER_EVENT = 'render-todo';
+const SAVED_EVENT = 'saved-todo';
 const STORAGE_KEY = 'BOOK_APPS';
 
 function generateId() {
@@ -28,7 +19,7 @@ function generateTodoObject(id, task,author, timestamp, isCompleted) {
 }
 
 function findTodo(todoId) {
-  for (const todoItem of book) {
+  for (const todoItem of todos) {
     if (todoItem.id === todoId) {
       return todoItem;
     }
@@ -37,8 +28,8 @@ function findTodo(todoId) {
 }
 
 function findTodoIndex(todoId) {
-  for (const index in book) {
-    if (book[index].id === todoId) {
+  for (const index in todos) {
+    if (todos[index].id === todoId) {
       return index;
     }
   }
@@ -65,7 +56,7 @@ function isStorageExist() /* boolean */ {
  */
 function saveData() {
   if (isStorageExist()) {
-    const parsed /* string */ = JSON.stringify(book);
+    const parsed /* string */ = JSON.stringify(todos);
     localStorage.setItem(STORAGE_KEY, parsed);
     document.dispatchEvent(new Event(SAVED_EVENT));
   }
@@ -73,7 +64,7 @@ function saveData() {
 
 /**
  * Fungsi ini digunakan untuk memuat data dari localStorage
- * Dan memasukkan data hasil parsing ke variabel {@see book}
+ * Dan memasukkan data hasil parsing ke variabel {@see todos}
  */
 function loadDataFromStorage() {
   const serializedData /* string */ = localStorage.getItem(STORAGE_KEY);
@@ -81,7 +72,7 @@ function loadDataFromStorage() {
 
   if (data !== null) {
     for (const todo of data) {
-      book.push(todo);
+      todos.push(todo);
     }
   }
 
@@ -94,9 +85,8 @@ function makeTodo(todoObject) {
 
   const textTitle = document.createElement('h2');
   textTitle.innerText = task;
-  const textAuthor = document.createElement('h3');
+  const textAuthor = document.createElement('h2');
   textAuthor.innerText = author;
-
   const textTimestamp = document.createElement('p');
   textTimestamp.innerText = timestamp;
 
@@ -143,8 +133,8 @@ function addTodo() {
   const timestamp = document.getElementById('date').value;
 
   const generatedID = generateId();
-  const todoObject = generateTodoObject(generatedID, textTodo,textAuthor, timestamp, false);
-  book.push(todoObject);
+  const todoObject = generateTodoObject(generatedID, textTodo, textAuthor,timestamp, false);
+  todos.push(todoObject);
 
   document.dispatchEvent(new Event(RENDER_EVENT));
   saveData();
@@ -165,7 +155,7 @@ function removeTaskFromCompleted(todoId /* HTMLELement */) {
 
   if (todoTarget === -1) return;
 
-  book.splice(todoTarget, 1);
+  todos.splice(todoTarget, 1);
   document.dispatchEvent(new Event(RENDER_EVENT));
   saveData();
 }
@@ -206,7 +196,7 @@ document.addEventListener(RENDER_EVENT, function () {
   uncompletedTODOList.innerHTML = '';
   listCompleted.innerHTML = '';
 
-  for (const todoItem of book) {
+  for (const todoItem of todos) {
     const todoElement = makeTodo(todoItem);
     if (todoItem.isCompleted) {
       listCompleted.append(todoElement);
